@@ -1,0 +1,125 @@
+/* =========================
+   HERO CAROUSEL (BOOTSTRAP)
+   ========================= */
+
+/* Use a CSS var for robust mobile viewport height */
+:root { --vh: 1vh; }
+
+/* Page reset & background */
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #000;       /* if anything peeks through, it's dark */
+}
+
+/* Base hero wrapper */
+.hero {
+  position: relative;
+  min-height: calc(var(--vh) * 100); /* fallback using var */
+  min-height: 100dvh;                /* modern mobile */
+  overflow: hidden;
+}
+
+/* Make the inner carousel fill the hero */
+.hero > .carousel,
+.hero .carousel-inner {
+  height: 100%;
+}
+
+/* Slides: full-viewport background panels */
+.hero .carousel-item {
+  position: relative;
+  min-height: calc(var(--vh) * 100);
+  min-height: 100dvh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #000; /* fallback for slow/missing images */
+
+  display: flex;               /* centers content vertically */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Prefer small-viewport units when supported (stable with URL bar visible) */
+@supports (height: 1svh) {
+  .hero,
+  .hero .carousel-item {
+    min-height: 100svh;
+  }
+}
+
+/* Fallback if dynamic viewport isn't supported */
+@supports not (height: 1dvh) {
+  .hero,
+  .hero .carousel-item {
+    min-height: 100vh;
+  }
+}
+
+/* Text contrast overlay (slightly stronger for readability) */
+.hero .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.45) 40%,
+    rgba(0, 0, 0, 0.70)
+  );
+  pointer-events: none;
+}
+
+/* Content block above overlay */
+.hero .hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem 1rem;
+  max-width: 980px;
+}
+
+/* Indicators on dark images + nudge up a bit from bottom */
+.hero .carousel-indicators {
+  bottom: 0.75rem;
+}
+.hero .carousel-indicators [data-bs-target] {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Collapsed details panel */
+.hero .collapse {
+  margin-top: 1rem;
+  background: rgba(0,0,0,0.5);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  backdrop-filter: saturate(120%) blur(2px);
+}
+
+/* Buttons natural width */
+.hero .btn { width: auto; }
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-fade .carousel-item { transition: none; }
+}
+
+/* =========================
+   SLIDE BACKGROUND IMAGES
+   (all images in /public_html/assets)
+   ========================= */
+.hero .carousel-item.hero-slide-1  { background-image: url("assets/ai-generated-8783105_1280.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-2  { background-image: url("assets/ai-generated-9000691_640.png?v=30") !important; }
+.hero .carousel-item.hero-slide-3  { background-image: url("assets/cyber-security-1805632_1280.webp?v=30") !important; }
+.hero .carousel-item.hero-slide-4  { background-image: url("assets/cyber-security-3400555_1280.webp?v=30") !important; }
+.hero .carousel-item.hero-slide-5  { background-image: url("assets/hacker-1944688_1280.webp?v=30") !important; }
+.hero .carousel-item.hero-slide-6  { background-image: url("assets/cyber-8431995_1280.png?v=30") !important; }
+.hero .carousel-item.hero-slide-7  { background-image: url("assets/security-4868162_1280.webp?v=30") !important; }
+.hero .carousel-item.hero-slide-8  { background-image: url("assets/istockphoto-1177652986-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-9  { background-image: url("assets/istockphoto-947372712-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-10 { background-image: url("assets/istockphoto-1453886503-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-11 { background-image: url("assets/istockphoto-2024864030-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-12 { background-image: url("assets/istockphoto-2212504511-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-13 { background-image: url("assets/istockphoto-953608350-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-14 { background-image: url("assets/istockphoto-970063848-612x612.jpg?v=30") !important; }
+.hero .carousel-item.hero-slide-15 { background-image: url("assets/webdev.jpeg.png?v=30") !important; }
+
