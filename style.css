@@ -2,7 +2,7 @@
    HERO CAROUSEL (BOOTSTRAP)
    ========================= */
 
-/* Use a CSS var for robust mobile viewport height */
+/* Use a CSS var for robust mobile viewport height; JS sets --vh */
 :root { --vh: 1vh; }
 
 /* Page reset & background */
@@ -15,12 +15,12 @@ html, body {
 /* Base hero wrapper */
 .hero {
   position: relative;
-  min-height: calc(var(--vh) * 100); /* fallback using var */
+  min-height: calc(var(--vh) * 100); /* primary (JS sets --vh) */
   min-height: 100dvh;                /* modern mobile */
   overflow: hidden;
 }
 
-/* Make the inner carousel fill the hero */
+/* Ensure inner carousel fills the hero */
 .hero > .carousel,
 .hero .carousel-inner {
   height: 100%;
@@ -86,21 +86,29 @@ html, body {
   background-color: rgba(255, 255, 255, 0.85);
 }
 
-/* Collapsed details panel */
+/* Collapsed details panel (for "More info" collapse content) */
 .hero .collapse {
   margin-top: 1rem;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.45);
   border-radius: 0.5rem;
   padding: 1rem;
   backdrop-filter: saturate(120%) blur(2px);
+  color: #fff;
 }
 
-/* Buttons natural width */
+/* Keep hero buttons natural width on small screens */
 .hero .btn { width: auto; }
 
 /* Accessibility: respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .carousel-fade .carousel-item { transition: none; }
+}
+
+/* Small tweaks for very narrow screens */
+@media (max-width: 420px) {
+  .hero .hero-content { padding: 1.5rem 0.75rem; }
+  .hero .display-5 { font-size: 1.5rem; line-height: 1.1; }
+  .hero .lead { font-size: 0.95rem; }
 }
 
 /* =========================
@@ -122,4 +130,8 @@ html, body {
 .hero .carousel-item.hero-slide-13 { background-image: url("assets/istockphoto-953608350-612x612.jpg?v=30") !important; }
 .hero .carousel-item.hero-slide-14 { background-image: url("assets/istockphoto-970063848-612x612.jpg?v=30") !important; }
 .hero .carousel-item.hero-slide-15 { background-image: url("assets/webdev.jpeg.png?v=30") !important; }
+
+
+
+
 
