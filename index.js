@@ -2,98 +2,101 @@
    SL CyberSecurity Services – Site JS
    - Lazy-load hero slide backgrounds
    - Fix mobile viewport height (no white gap)
+   - Pause/Play carousel toggle
    - (Optional) Footer year
 ============================== */
-
-// (Optional) auto-set footer year if you have <span id="year"></span>
-function setFooterYear() {
-  const y = document.getElementById("year");
-  if (y) y.textContent = new Date().getFullYear();
-}
 
 /* ----- Fix viewport height on mobile (prevents white gap) ----- */
 function setVh() {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
-
-// Nudge layout so Safari/iOS recomputes height correctly
-function forceReflow(el) { void el.offsetHeight; }
-
-// (Optional) lightweight prefetch for next background image
-function prefetch(url) {
-  if (!url) return;
-  const img = new Image();
-  img.src = url;
-}
-
-/* Run early and keep it updated */
-document.addEventListener('DOMContentLoaded', setVh);
 window.addEventListener('load', setVh, { passive: true });
 window.addEventListener('resize', setVh, { passive: true });
 window.addEventListener('orientationchange', setVh, { passive: true });
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', setVh, { passive: true });
 }
+setVh(); // run once immediately
 
-/* ----- Lazy-load hero slide backgrounds ----- */
+/* (Optional) auto-set footer year if you use <span id="year"></span> */
+function setFooterYear() {
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+}
+
+/* ----- Lazy-load hero slide backgrounds & prefetch strategy ----- */
 document.addEventListener("DOMContentLoaded", () => {
   setFooterYear(); // safe if #year doesn't exist
 
   const carousel = document.getElementById("heroCarousel");
   if (!carousel) return;
 
-  const applyBg = (item) => {
+  // apply background to an item and optionally prefetch via Image() to warm cache
+  const applyBg = (item, preload = true) => {
     if (!item || item.dataset.applied === "1") return;
     const src = item.getAttribute("data-bg");
     if (src) {
       item.style.backgroundImage = `url("${src}")`;
       item.dataset.applied = "1";
+      if (preload) {
+        // create an Image to warm browser cache (non-blocking)
+        const im = new Image();
+        im.src = src;
+      }
     }
   };
 
-  // 1) Apply to the active slide immediately
-  const active = carousel.querySelector(".carousel-item.active");
-  applyBg(active);
+  // Immediately apply to the active slide
+  applyBg(carousel.querySelector(".carousel-item.active"));
 
-  // Prefetch the next two slides if available
-  if (active && active.parentElement) {
-    const items = Array.from(active.parentElement.children);
-    const idx = items.indexOf(active);
-    const next = items[idx + 1];
-    const following = items[idx + 2];
-    if (next) {
-      applyBg(next); // eager apply for immediate smoothness
-      prefetch(next.getAttribute("data-bg"));
-    }
-    if (following) prefetch(following.getAttribute("data-bg"));
-  }
-
-  // 2) Before slide transition: ensure next (and following) have BG set
+  // When slide is about to change, apply the new slide's bg and prefetch following
   carousel.addEventListener("slide.bs.carousel", (e) => {
     const next = e.relatedTarget;
-    applyBg(next);
+    applyBg(next, true);
 
+    // also attempt to preload the following slide for smoother UX
     const items = Array.from(next.parentElement.children);
     const nextIndex = items.indexOf(next);
     const following = items[nextIndex + 1];
-    applyBg(following); // eager apply improves perceived performance
-
-    // Recalculate viewport height and nudge layout during transition
-    setVh();
-    forceReflow(carousel);
-
-    // Prefetch one more ahead
-    const afterFollowing = items[nextIndex + 2];
-    if (afterFollowing) prefetch(afterFollowing.getAttribute("data-bg"));
+    applyBg(following, true);
   });
 
-  // 3) After slide transition: recalc & nudge again (iOS/Safari)
-  carousel.addEventListener("slid.bs.carousel", () => {
-    setVh();
-    forceReflow(carousel);
-  });
+  // Pre-apply first two slides if they exist (extra speed on first paint)
+  const first = carousel.querySelectorAll(".carousel-item")[0];
+  const second = carousel.querySelectorAll(".carousel-item")[1];
+  applyBg(first);
+  applyBg(second);
 });
 
+/* ----- Carousel pause/play toggle (button with id="carouselToggle") ----- */
+(function carouselToggleHandler(){
+  document.addEventListener('DOMContentLoaded', () => {
+    const carouselEl = document.getElementById('heroCarousel');
+    if (!carouselEl) return;
+    const bsCarousel = bootstrap.Carousel.getOrCreateInstance(carouselEl);
+    const toggle = document.getElementById('carouselToggle');
+    if (!toggle) return;
 
+    const setLabel = (paused) => {
+      toggle.textContent = paused ? '▶ Play' : '⏸ Pause';
+    };
 
+    // start with playing (Bootstrap auto starts if data-bs-ride="carousel")
+    let paused = false;
+    setLabel(paused);
+
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!bsCarousel) return;
+      if (!paused) {
+        bsCarousel.pause();
+        paused = true;
+      } else {
+        bsCarousel.cycle();
+        paused = false;
+      }
+      setLabel(paused);
+    });
+  });
+})();
